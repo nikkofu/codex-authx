@@ -346,6 +346,18 @@ describe("codex-authx release layout", () => {
     expect(workflow).toContain("uses: actions/upload-artifact@v6");
     expect(workflow).toContain("uses: actions/download-artifact@v5");
   });
+
+  it("only validates release tags on tag-triggered runs", async () => {
+    const workflow = await readFile(
+      path.join(process.cwd(), ".github", "workflows", "release-binaries.yml"),
+      "utf8"
+    );
+
+    expect(workflow).toContain("- name: Verify release tag matches package version");
+    expect(workflow).toContain(
+      "- name: Verify release tag matches package version\n        if: startsWith(github.ref, 'refs/tags/v')"
+    );
+  });
 });
 
 describe("codex-authx release notes", () => {
