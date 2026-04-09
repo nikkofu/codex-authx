@@ -57,7 +57,7 @@ jobs:
       - name: Download built archives
         uses: actions/download-artifact@v8
         with:
-          path: release-artifacts
+          path: /tmp/release-artifacts
 
       - name: Checkout
         uses: actions/checkout@v5
@@ -80,13 +80,13 @@ jobs:
           TAG_NAME: ${{ github.ref_name }}
         run: |
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-            gh release edit "$TAG_NAME" --title "$TAG_NAME" --notes-file release-notes.txt
+            gh release edit "$TAG_NAME" --title "$TAG_NAME" --notes-file release-notes.txt --draft=false
           else
             gh release create "$TAG_NAME" --title "$TAG_NAME" --notes-file release-notes.txt --verify-tag
           fi
-          mapfile -t archives < <(find release-artifacts -type f -name '*.tar.gz' | sort)
+          mapfile -t archives < <(find /tmp/release-artifacts -type f -name '*.tar.gz' | sort)
           if [ "${#archives[@]}" -eq 0 ]; then
-            echo "No release archives found under release-artifacts" >&2
+            echo "No release archives found under /tmp/release-artifacts" >&2
             exit 1
           fi
           gh release upload "$TAG_NAME" "${archives[@]}" --clobber
