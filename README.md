@@ -84,6 +84,24 @@ The GitHub Actions workflow `.github/workflows/release-binaries.yml` builds both
 
 The first build may download binary build dependencies for the packager.
 
+### Publish a GitHub Release
+
+1. Update `package.json` `version`
+2. Update the matching version section in `CHANGELOG.md`
+3. Commit and push to `main`
+4. Create a matching tag:
+
+```bash
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+The release workflow enforces that:
+
+- `vX.Y.Z` matches `package.json.version`
+- release notes come from the `CHANGELOG.md` section for that version
+- both macOS archives are attached to the GitHub Release
+
 ## Usage
 
 ### Initialize and print version

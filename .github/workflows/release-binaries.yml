@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify release tag matches package version
+        run: node ./scripts/extract-release-notes.mjs "${GITHUB_REF_NAME}" /tmp/release-notes.txt
+
       - name: Test
         run: npm test
 
@@ -53,9 +56,25 @@ jobs:
         with:
           path: release-artifacts
 
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Extract release notes from changelog
+        run: node ./scripts/extract-release-notes.mjs "${GITHUB_REF_NAME}" release-notes.txt
+
       - name: Publish GitHub Release assets
         uses: softprops/action-gh-release@v2
         with:
+          body_path: release-notes.txt
           files: |
             release-artifacts/codex-authx-macos-x64/codex-authx-macos-x64.tar.gz
             release-artifacts/codex-authx-macos-arm64/codex-authx-macos-arm64.tar.gz

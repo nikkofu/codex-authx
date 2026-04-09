@@ -26,6 +26,11 @@ import {
   releaseArchiveEntries,
   releaseDirectoryNameForTarget
 } from "../src/release/layout.js";
+import {
+  extractReleaseNotes,
+  normalizeTagVersion,
+  validateReleaseTag
+} from "../src/release/notes.js";
 
 const tempDirs: string[] = [];
 const execFileAsync = promisify(execFile);
@@ -326,5 +331,26 @@ describe("codex-authx release layout", () => {
     expect(packageJson.scripts["build:bin"]).toBe("node ./scripts/build-release.mjs");
     expect(packageJson.scripts["build:release"]).toBe("npm run build:js && npm run build:bin");
     expect(releaseArchiveEntries()).toEqual(["codex-authx", "README.md", "LICENSE"]);
+  });
+});
+
+describe("codex-authx release notes", () => {
+  it("extracts the changelog section for the package version", async () => {
+    const changelog = await readFile(path.join(process.cwd(), "CHANGELOG.md"), "utf8");
+
+    expect(extractReleaseNotes(changelog, "0.1.0")).toContain(
+      "Renamed the public command to `codex-authx`."
+    );
+  });
+
+  it("normalizes git tags by stripping the leading v", () => {
+    expect(normalizeTagVersion("v0.1.0")).toBe("0.1.0");
+  });
+
+  it("validates that the release tag matches package.json version", () => {
+    expect(() => validateReleaseTag("v0.1.0", "0.1.0")).not.toThrow();
+    expect(() => validateReleaseTag("v0.1.1", "0.1.0")).toThrowError(
+      "release tag v0.1.1 does not match package.json version 0.1.0"
+    );
   });
 });
