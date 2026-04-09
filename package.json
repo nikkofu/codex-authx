@@ -15,8 +15,7 @@
   "scripts": {
     "test": "vitest run",
     "build": "tsc -p tsconfig.json",
-    "authx": "node ./bin/authx.js",
-    "install:local": "npm run build && node ./scripts/install-local.mjs"
+    "authx": "node ./bin/authx.js"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",

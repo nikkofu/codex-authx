@@ -12,11 +12,6 @@ import {
   switchProfile
 } from "../src/core/authx.js";
 import {
-  createMarketplaceEntry,
-  type MarketplaceFile,
-  upsertMarketplacePlugin
-} from "../src/install/local-install.js";
-import {
   assertSavableProfileName,
   normalizeProfileName
 } from "../src/core/naming.js";
@@ -41,16 +36,6 @@ async function makeHomeDir(): Promise<string> {
 
 async function runCli(args: string[], homeDir: string): Promise<{ stdout: string; stderr: string }> {
   return execFileAsync(process.execPath, ["bin/authx.js", ...args], {
-    cwd: process.cwd(),
-    env: {
-      ...process.env,
-      AUTHX_HOME_DIR: homeDir
-    }
-  });
-}
-
-async function runPlugin(args: string[], homeDir: string): Promise<{ stdout: string; stderr: string }> {
-  return execFileAsync(process.execPath, ["plugins/authx/bin/authx-plugin.js", ...args], {
     cwd: process.cwd(),
     env: {
       ...process.env,
@@ -257,63 +242,5 @@ describe("authx cli", () => {
     await expect(readFile(path.join(codexDir, "auth.json"), "utf8")).resolves.toBe(
       '{"token":"after"}'
     );
-  });
-});
-
-describe("authx plugin wrapper", () => {
-  it("delegates to the cli entrypoint", async () => {
-    const homeDir = await makeHomeDir();
-    const authxDir = path.join(homeDir, ".codex", "authx");
-    await mkdir(authxDir, { recursive: true });
-    await writeFile(path.join(authxDir, "default.json"), "{}");
-    await writeFile(path.join(authxDir, "team-a.json"), "{}");
-
-    const result = await runPlugin(["list"], homeDir);
-
-    expect(result.stdout.trim()).toBe("default\nteam-a");
-  });
-});
-
-describe("authx local install helpers", () => {
-  it("adds authx to a marketplace while preserving existing plugins", () => {
-    const marketplace: MarketplaceFile = {
-      name: "local-marketplace",
-      interface: {
-        displayName: "Local"
-      },
-      plugins: [
-        {
-          name: "existing",
-          source: { source: "local", path: "./plugins/existing" },
-          policy: { installation: "AVAILABLE", authentication: "ON_INSTALL" },
-          category: "Productivity"
-        }
-      ]
-    };
-
-    const updated = upsertMarketplacePlugin(
-      marketplace,
-      createMarketplaceEntry("./plugins/authx")
-    );
-
-    expect(updated.plugins.map((plugin) => plugin.name)).toEqual(["existing", "authx"]);
-  });
-
-  it("replaces the authx entry instead of duplicating it", () => {
-    const marketplace: MarketplaceFile = {
-      name: "local-marketplace",
-      interface: {
-        displayName: "Local"
-      },
-      plugins: [createMarketplaceEntry("./plugins/old-authx")]
-    };
-
-    const updated = upsertMarketplacePlugin(
-      marketplace,
-      createMarketplaceEntry("./plugins/authx")
-    );
-
-    expect(updated.plugins).toHaveLength(1);
-    expect(updated.plugins[0]?.source.path).toBe("./plugins/authx");
   });
 });

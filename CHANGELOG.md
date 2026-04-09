@@ -5,8 +5,5 @@
 - Added a TypeScript `authx` CLI for initializing, listing, saving, and switching Codex auth profiles.
 - Added safe profile-name normalization and reserved-name protection.
 - Added automatic `last-active.json` backup during profile switching.
-- Added a thin local plugin wrapper under `plugins/authx/`.
-- Added a local installer that wires the plugin marketplace and global `/authx` command from the cloned GitHub repo.
-- Added command metadata under `commands/authx.md`.
 - Added setup, install, and usage documentation.
-- Removed the duplicate repo-local marketplace manifest so only the global installed plugin entry is used.
+- Removed the abandoned Codex plugin/command integration path and kept the project CLI-only.

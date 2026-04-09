@@ -1,6 +1,6 @@
 # codex-authx
 
-`codex-authx` is a local profile switcher for Codex auth files. It stores multiple `auth.json`-style profiles under `~/.codex/authx/` and lets you initialize, list, save, and switch between them from a CLI or a thin Codex-facing wrapper.
+`codex-authx` is a local profile switcher for Codex auth files. It stores multiple `auth.json`-style profiles under `~/.codex/authx/` and lets you initialize, list, save, and switch between them from a local CLI.
 
 ## Features
 
@@ -10,7 +10,6 @@
 - Saves the current active auth into a normalized profile filename
 - Switches the active `~/.codex/auth.json` to a saved profile
 - Backs up the previous active auth file to `~/.codex/authx/last-active.json`
-- Ships a repo-local slash-command prompt and a thin plugin wrapper
 
 ## Requirements
 
@@ -27,22 +26,6 @@ git clone https://github.com/nikkofu/codex-authx.git
 cd codex-authx
 npm install
 ```
-
-### Install into local Codex directories
-
-From the cloned GitHub repo:
-
-```bash
-npm run install:local
-```
-
-This does three things:
-
-- creates or updates `~/.agents/plugins/marketplace.json`
-- links `plugins/authx/` into `~/plugins/authx`
-- links `commands/authx.md` into `~/.codex/commands/authx.md`
-
-After that, restart Codex if your client caches plugin or command discovery.
 
 ### Optional local CLI exposure
 
@@ -131,17 +114,7 @@ Then `~/.codex/authx/team-a.json` is copied over `~/.codex/auth.json`.
 
 ## Codex Integration
 
-This repo includes two thin Codex-facing adapters.
-
-### Global slash command install
-
-`npm run install:local` links `commands/authx.md` to `~/.codex/commands/authx.md`, which is intended to expose `/authx` as a global command on Codex setups that scan that directory.
-
-### Local plugin wrapper
-
-`plugins/authx/` contains a thin wrapper that delegates directly to `bin/authx.js`. The installer writes or updates `~/.agents/plugins/marketplace.json` and links the plugin into `~/plugins/authx`.
-
-The wrapper intentionally does not reimplement auth logic; it just forwards arguments to the CLI.
+This project now targets the CLI only. Codex-local command and plugin wrappers were removed after verifying that the current Codex client does not provide a reliable custom extension path for this workflow.
 
 ## Development
 
@@ -163,16 +136,10 @@ Run the CLI without linking:
 npm run authx -- list
 ```
 
-Reinstall the Codex command/plugin wiring after updates:
-
-```bash
-npm run install:local
-```
-
 ## Release Notes Discipline
 
 When publishing changes:
 
 - Update `README.md` if install or usage changed
 - Update `CHANGELOG.md`
-- Keep command and plugin integration docs aligned with the shipped behavior
+- Keep CLI install and usage docs aligned with the shipped behavior
