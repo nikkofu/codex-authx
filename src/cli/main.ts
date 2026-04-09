@@ -16,7 +16,7 @@ function resolveHomeDir(): string {
 
 function renderHelp(seedMessage?: string): string {
   const lines = [
-    "codex-authx v0.1.3"
+    "codex-authx v0.1.4"
   ];
 
   if (seedMessage) {
@@ -138,7 +138,7 @@ export async function runCli(args: string[]): Promise<number> {
       const status = await readStatusSummary({ homeDir });
       console.log(
         renderDefaultStatus({
-          version: "codex-authx v0.1.3",
+          version: "codex-authx v0.1.4",
           seededDefault: initialization.seededDefault,
           current: status.current
         })

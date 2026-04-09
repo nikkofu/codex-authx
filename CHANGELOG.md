@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4 - 2026-04-09
+
+- Fixed profile discovery so internal cache files such as `usage-server.json` no longer appear in `codex-authx list` or `codex-authx usage`.
+- Added a regression test covering internal authx cache files during profile listing.
+
 ## 0.1.3 - 2026-04-09
 
 - Replaced the default no-argument help screen with a status-first dashboard showing the current profile, local rolling usage, and the latest official 5-hour / 7-day Codex rate-limit snapshot.

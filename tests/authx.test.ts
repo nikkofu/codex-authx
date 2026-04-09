@@ -142,7 +142,7 @@ async function seedStateDb(
         ) values (
           'thread-${index}', 'inline', ${row.createdAt}, ${row.updatedAt}, 'cli', 'openai',
           '/tmp/project', '${row.title ?? `Thread ${index}`}', 'workspace-write', 'default',
-          ${row.tokensUsed}, 1, 0, '0.1.3', '', 'enabled'
+          ${row.tokensUsed}, 1, 0, '0.1.4', '', 'enabled'
         );
       `
     );
@@ -230,13 +230,15 @@ describe("authx initialization and listing", () => {
     expect(defaultContents).toBe('{"token":"original"}');
   });
 
-  it("lists profiles alphabetically and excludes last-active", async () => {
+  it("lists profiles alphabetically and excludes internal authx cache files", async () => {
     const homeDir = await makeHomeDir();
     const authxDir = path.join(homeDir, ".codex", "authx");
     await mkdir(authxDir, { recursive: true });
     await writeFile(path.join(authxDir, "zebra.json"), "{}");
     await writeFile(path.join(authxDir, "default.json"), "{}");
     await writeFile(path.join(authxDir, "last-active.json"), "{}");
+    await writeFile(path.join(authxDir, "usage-remote.json"), "{}");
+    await writeFile(path.join(authxDir, "usage-server.json"), "{}");
     await writeFile(path.join(authxDir, "alpha.json"), "{}");
 
     await expect(listProfiles({ homeDir })).resolves.toEqual(["alpha", "default", "zebra"]);
@@ -714,7 +716,7 @@ describe("codex-authx cli", () => {
 
     const result = await runCli([], homeDir);
 
-    expect(result.stdout).toContain("codex-authx v0.1.3");
+    expect(result.stdout).toContain("codex-authx v0.1.4");
     expect(result.stdout).toContain("current: team-b");
     expect(result.stdout).toContain("account_id=acct-b");
     expect(result.stdout).toContain("local 5h=150 7d=150");

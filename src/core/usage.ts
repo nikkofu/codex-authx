@@ -8,7 +8,7 @@ import { resolveAuthxPaths, resolveProfilePath } from "./paths.js";
 const execFileAsync = promisify(execFile);
 const FIVE_HOURS_MS = 5 * 60 * 60 * 1000;
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-const INTERNAL_PROFILE_FILES = new Set(["usage-remote"]);
+const INTERNAL_PROFILE_FILES = new Set(["usage-remote", "usage-server"]);
 
 export interface UsageLedgerEvent {
   timestamp: string;

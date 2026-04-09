@@ -14,6 +14,8 @@ export interface AuthxOptions {
   homeDir: string;
 }
 
+const INTERNAL_PROFILE_FILES = new Set(["usage-remote", "usage-server"]);
+
 export interface SaveProfileOptions extends AuthxOptions {
   profileName: string;
   now?: Date;
@@ -45,7 +47,6 @@ export async function initializeAuthx({
 
 export async function listProfiles({ homeDir }: AuthxOptions): Promise<string[]> {
   const { authxDir } = resolveAuthxPaths(homeDir);
-  const internalProfileFiles = new Set(["usage-remote"]);
 
   try {
     const entries = await readdir(authxDir, { withFileTypes: true });
@@ -53,7 +54,7 @@ export async function listProfiles({ homeDir }: AuthxOptions): Promise<string[]>
     return entries
       .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
       .map((entry) => entry.name.slice(0, -".json".length))
-      .filter((name) => !internalProfileFiles.has(name))
+      .filter((name) => !INTERNAL_PROFILE_FILES.has(name))
       .filter((name) => !isReservedProfileName(name))
       .sort((left, right) => left.localeCompare(right));
   } catch (error) {
