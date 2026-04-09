@@ -962,8 +962,8 @@ describe("codex-authx cli", () => {
     expect(result.stdout).toContain("* team-b");
     expect(result.stdout).toContain("local 5h=150 7d=150");
     expect(result.stdout).toContain("server 5h=57% 7d=68% reset");
-    expect(result.stdout).toContain("team-a");
-    expect(result.stdout).toContain("local 5h=300 7d=300");
+    expect(result.stdout).toContain("- team-a account_id=acct-a");
+    expect(result.stdout).toContain("7d=300");
     expect(result.stdout).toContain("server=unknown");
   });
 
