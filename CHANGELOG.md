@@ -9,3 +9,4 @@
 - Added a local installer that wires the plugin marketplace and global `/authx` command from the cloned GitHub repo.
 - Added command metadata under `commands/authx.md`.
 - Added setup, install, and usage documentation.
+- Removed the duplicate repo-local marketplace manifest so only the global installed plugin entry is used.
