@@ -2,6 +2,13 @@ import { copyFile, mkdir, readdir } from "node:fs/promises";
 
 import { assertSavableProfileName, isReservedProfileName } from "./naming.js";
 import { resolveAuthxPaths, resolveProfilePath } from "./paths.js";
+import {
+  appendUsageLedgerEvent,
+  readAuthFile,
+  readTotalTokens,
+  readUsageSummary,
+  resolveActiveProfile
+} from "./usage.js";
 
 export interface AuthxOptions {
   homeDir: string;
@@ -9,6 +16,7 @@ export interface AuthxOptions {
 
 export interface SaveProfileOptions extends AuthxOptions {
   profileName: string;
+  now?: Date;
 }
 
 export async function initializeAuthx({
@@ -37,6 +45,7 @@ export async function initializeAuthx({
 
 export async function listProfiles({ homeDir }: AuthxOptions): Promise<string[]> {
   const { authxDir } = resolveAuthxPaths(homeDir);
+  const internalProfileFiles = new Set(["usage-remote"]);
 
   try {
     const entries = await readdir(authxDir, { withFileTypes: true });
@@ -44,6 +53,7 @@ export async function listProfiles({ homeDir }: AuthxOptions): Promise<string[]>
     return entries
       .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
       .map((entry) => entry.name.slice(0, -".json".length))
+      .filter((name) => !internalProfileFiles.has(name))
       .filter((name) => !isReservedProfileName(name))
       .sort((left, right) => left.localeCompare(right));
   } catch (error) {
@@ -79,7 +89,8 @@ export async function saveProfile({
 
 export async function switchProfile({
   homeDir,
-  profileName
+  profileName,
+  now
 }: SaveProfileOptions): Promise<{ profileName: string }> {
   const normalizedName = assertSavableProfileName(profileName);
   const paths = resolveAuthxPaths(homeDir);
@@ -105,5 +116,16 @@ export async function switchProfile({
     throw error;
   }
 
+  const targetAuth = await readAuthFile(targetProfile);
+  await appendUsageLedgerEvent({
+    homeDir,
+    profileName: normalizedName,
+    accountId: targetAuth.accountId,
+    totalTokens: await readTotalTokens(homeDir),
+    now
+  });
+
   return { profileName: normalizedName };
 }
+
+export { readUsageSummary, resolveActiveProfile };

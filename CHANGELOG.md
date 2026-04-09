@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.3 - 2026-04-09
+
+- Replaced the default no-argument help screen with a status-first dashboard showing the current profile, local rolling usage, and the latest official 5-hour / 7-day Codex rate-limit snapshot.
+- Added profile-aware status rendering to `codex-authx list`, including current-profile markers, local token estimates, official server usage percentages, and reset timestamps.
+- Added mixed local/server usage reporting to `codex-authx usage`, with official snapshots sourced from Codex session rollouts under `~/.codex/sessions/`.
+- Persisted the latest resolved official server snapshot to `~/.codex/authx/usage-server.json` for safe fallback without modifying auth credentials.
+- Kept `whoami` available while shifting the primary workflow to `codex-authx`, `codex-authx list`, and `codex-authx usage`.
+
 ## 0.1.2 - 2026-04-09
 
 - Added `codex-authx help` and made the no-argument command print a usage guide instead of only a status line.

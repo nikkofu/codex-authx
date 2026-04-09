@@ -5,6 +5,10 @@ export interface AuthxPaths {
   authFile: string;
   defaultProfile: string;
   lastActiveProfile: string;
+  usageLedgerFile: string;
+  remoteUsageFile: string;
+  serverUsageFile: string;
+  stateDbFile: string;
 }
 
 export function resolveAuthxPaths(homeDir: string): AuthxPaths {
@@ -15,7 +19,11 @@ export function resolveAuthxPaths(homeDir: string): AuthxPaths {
     authxDir,
     authFile: path.join(codexDir, "auth.json"),
     defaultProfile: path.join(authxDir, "default.json"),
-    lastActiveProfile: path.join(authxDir, "last-active.json")
+    lastActiveProfile: path.join(authxDir, "last-active.json"),
+    usageLedgerFile: path.join(authxDir, "usage-ledger.jsonl"),
+    remoteUsageFile: path.join(authxDir, "usage-remote.json"),
+    serverUsageFile: path.join(authxDir, "usage-server.json"),
+    stateDbFile: path.join(codexDir, "state_5.sqlite")
   };
 }
 
