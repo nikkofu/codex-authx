@@ -1070,6 +1070,19 @@ describe("codex-authx release layout", () => {
     );
   });
 
+  it("allows workflow_dispatch runs to target an explicit release tag", async () => {
+    const workflow = await readFile(
+      path.join(process.cwd(), ".github", "workflows", "release-binaries.yml"),
+      "utf8"
+    );
+
+    expect(workflow).toContain("workflow_dispatch:");
+    expect(workflow).toContain("inputs:");
+    expect(workflow).toContain("release_tag:");
+    expect(workflow).toContain("required: true");
+    expect(workflow).toContain("ref: ${{ github.event.inputs.release_tag || github.ref }}");
+  });
+
   it("grants publish permission to create GitHub releases", async () => {
     const workflow = await readFile(
       path.join(process.cwd(), ".github", "workflows", "release-binaries.yml"),
@@ -1097,7 +1110,11 @@ describe("codex-authx release layout", () => {
       "utf8"
     );
 
+    expect(workflow).toContain(
+      "if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'"
+    );
     expect(workflow).toContain("GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}");
+    expect(workflow).toContain('TAG_NAME: ${{ github.event.inputs.release_tag || github.ref_name }}');
     expect(workflow).toContain("gh release view");
     expect(workflow).toContain("gh release edit");
     expect(workflow).toContain("--draft=false");

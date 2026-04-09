@@ -102,6 +102,8 @@ The release workflow enforces that:
 - release notes come from the `CHANGELOG.md` section for that version
 - both macOS archives are attached to the GitHub Release
 
+If you need to backfill a release for an existing tag, open the GitHub Actions workflow `release-binaries`, run it manually, and provide the exact tag in the `release_tag` input, for example `v0.1.4`.
+
 ## Usage
 
 ### Show current status by default
