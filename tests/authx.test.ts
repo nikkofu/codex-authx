@@ -332,6 +332,20 @@ describe("codex-authx release layout", () => {
     expect(packageJson.scripts["build:release"]).toBe("npm run build:js && npm run build:bin");
     expect(releaseArchiveEntries()).toEqual(["codex-authx", "README.md", "LICENSE"]);
   });
+
+  it("uses supported GitHub Actions runner labels and node24-compatible actions", async () => {
+    const workflow = await readFile(
+      path.join(process.cwd(), ".github", "workflows", "release-binaries.yml"),
+      "utf8"
+    );
+
+    expect(workflow).toContain("runner: macos-15-intel");
+    expect(workflow).toContain("runner: macos-14");
+    expect(workflow).toContain("uses: actions/checkout@v5");
+    expect(workflow).toContain("uses: actions/setup-node@v6");
+    expect(workflow).toContain("uses: actions/upload-artifact@v6");
+    expect(workflow).toContain("uses: actions/download-artifact@v5");
+  });
 });
 
 describe("codex-authx release notes", () => {
