@@ -344,7 +344,8 @@ describe("codex-authx release layout", () => {
     expect(workflow).toContain("uses: actions/checkout@v5");
     expect(workflow).toContain("uses: actions/setup-node@v6");
     expect(workflow).toContain("uses: actions/upload-artifact@v6");
-    expect(workflow).toContain("uses: actions/download-artifact@v5");
+    expect(workflow).toContain("uses: actions/download-artifact@v8");
+    expect(workflow).toContain("uses: softprops/action-gh-release@v2.6.1");
   });
 
   it("only validates release tags on tag-triggered runs", async () => {
@@ -357,6 +358,26 @@ describe("codex-authx release layout", () => {
     expect(workflow).toContain(
       "- name: Verify release tag matches package version\n        if: startsWith(github.ref, 'refs/tags/v')"
     );
+  });
+
+  it("grants publish permission to create GitHub releases", async () => {
+    const workflow = await readFile(
+      path.join(process.cwd(), ".github", "workflows", "release-binaries.yml"),
+      "utf8"
+    );
+
+    expect(workflow).toContain("publish:");
+    expect(workflow).toContain("permissions:");
+    expect(workflow).toContain("contents: write");
+  });
+
+  it("publishes any downloaded release archives without assuming artifact subpaths", async () => {
+    const workflow = await readFile(
+      path.join(process.cwd(), ".github", "workflows", "release-binaries.yml"),
+      "utf8"
+    );
+
+    expect(workflow).toContain("release-artifacts/**/*.tar.gz");
   });
 });
 

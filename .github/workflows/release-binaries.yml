@@ -50,10 +50,12 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Download built archives
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           path: release-artifacts
 
@@ -73,9 +75,7 @@ jobs:
         run: node ./scripts/extract-release-notes.mjs "${GITHUB_REF_NAME}" release-notes.txt
 
       - name: Publish GitHub Release assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.6.1
         with:
           body_path: release-notes.txt
-          files: |
-            release-artifacts/codex-authx-macos-x64/codex-authx-macos-x64.tar.gz
-            release-artifacts/codex-authx-macos-arm64/codex-authx-macos-arm64.tar.gz
+          files: release-artifacts/**/*.tar.gz
