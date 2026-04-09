@@ -118,6 +118,8 @@ npm run codex-authx
 
 This prints the current version, creates `~/.codex/authx/` if missing, and copies `~/.codex/auth.json` to `~/.codex/authx/default.json` if `default.json` does not already exist.
 
+The same first-run initialization also happens before `list`, `save`, and `switch`, so users do not need to run a separate bootstrap command first.
+
 ### List profiles
 
 ```bash
@@ -131,6 +133,8 @@ default
 team-a
 team-b
 ```
+
+On a first run, `list` also seeds `default.json` automatically when `~/.codex/auth.json` already exists.
 
 ### Save the current active auth as a named profile
 

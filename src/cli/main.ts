@@ -18,10 +18,11 @@ export async function runCli(args: string[]): Promise<number> {
   const [command, ...rest] = args;
 
   try {
+    const initialization = await initializeAuthx({ homeDir });
+
     if (!command) {
-      const result = await initializeAuthx({ homeDir });
       console.log(`codex-authx v0.1.0`);
-      console.log(result.seededDefault ? "initialized default profile" : "authx ready");
+      console.log(initialization.seededDefault ? "initialized default profile" : "authx ready");
       return 0;
     }
 

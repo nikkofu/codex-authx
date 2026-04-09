@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 - 2026-04-09
+
+- Fixed first-run CLI behavior so `list`, `save`, and `switch` also initialize `~/.codex/authx/`.
+- Fixed first-run profile seeding so `codex-authx list` now auto-creates `default.json` when `~/.codex/auth.json` already exists.
+- Switched GitHub Release publishing from `softprops/action-gh-release` to `gh release` and hardened the workflow against manual runs and artifact path issues.
+
 ## 0.1.0 - 2026-04-09
 
 - Added a TypeScript `authx` CLI for initializing, listing, saving, and switching Codex auth profiles.

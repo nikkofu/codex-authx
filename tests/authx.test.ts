@@ -239,6 +239,20 @@ describe("codex-authx cli", () => {
     expect(result.stdout.trim()).toBe("default\nteam-a");
   });
 
+  it("seeds the default profile before listing on first run", async () => {
+    const homeDir = await makeHomeDir();
+    const codexDir = path.join(homeDir, ".codex");
+    await mkdir(codexDir, { recursive: true });
+    await writeFile(path.join(codexDir, "auth.json"), '{"token":"active"}');
+
+    const result = await runCli(["list"], homeDir);
+
+    expect(result.stdout.trim()).toBe("default");
+    await expect(readFile(path.join(codexDir, "authx", "default.json"), "utf8")).resolves.toBe(
+      '{"token":"active"}'
+    );
+  });
+
   it("saves the current profile through the cli", async () => {
     const homeDir = await makeHomeDir();
     const codexDir = path.join(homeDir, ".codex");
