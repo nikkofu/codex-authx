@@ -377,7 +377,7 @@ describe("codex-authx release layout", () => {
       "utf8"
     );
 
-    expect(workflow).toContain("release-artifacts/**/*.tar.gz");
+    expect(workflow).toContain("find release-artifacts -type f -name '*.tar.gz'");
   });
 
   it("publishes releases via gh cli with an explicit GitHub token", async () => {
@@ -388,6 +388,7 @@ describe("codex-authx release layout", () => {
 
     expect(workflow).toContain("GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}");
     expect(workflow).toContain("gh release view");
+    expect(workflow).toContain("gh release edit");
     expect(workflow).toContain("gh release create");
     expect(workflow).toContain("gh release upload");
   });

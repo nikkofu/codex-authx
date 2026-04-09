@@ -84,4 +84,9 @@ jobs:
           else
             gh release create "$TAG_NAME" --title "$TAG_NAME" --notes-file release-notes.txt --verify-tag
           fi
-          gh release upload "$TAG_NAME" release-artifacts/**/*.tar.gz --clobber
+          mapfile -t archives < <(find release-artifacts -type f -name '*.tar.gz' | sort)
+          if [ "${#archives[@]}" -eq 0 ]; then
+            echo "No release archives found under release-artifacts" >&2
+            exit 1
+          fi
+          gh release upload "$TAG_NAME" "${archives[@]}" --clobber
