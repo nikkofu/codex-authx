@@ -2,8 +2,18 @@
 
 ## 0.1.4 - 2026-04-09
 
+This is a follow-up patch release for `0.1.3`.
+
 - Fixed profile discovery so internal cache files such as `usage-server.json` no longer appear in `codex-authx list` or `codex-authx usage`.
-- Added a regression test covering internal authx cache files during profile listing.
+- Kept the status workflow unchanged: the default command, `list`, and `usage` still show the current profile, local token estimates, and the latest available official 5-hour / 7-day Codex rate-limit snapshot.
+- Added a regression test so internal authx cache files are excluded from profile listing and mixed usage output going forward.
+
+Recommended validation after upgrading:
+
+- Run `codex-authx`
+- Run `codex-authx list`
+- Run `codex-authx usage`
+- Confirm that only real profiles are shown, and internal cache files are not listed
 
 ## 0.1.3 - 2026-04-09
 
