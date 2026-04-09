@@ -1,6 +1,6 @@
 # codex-authx
 
-`codex-authx` is a local profile switcher for Codex auth files. It stores multiple `auth.json`-style profiles under `~/.codex/authx/` and lets you initialize, list, save, and switch between them from a local CLI.
+`codex-authx` is a local profile switcher for Codex auth files. It stores multiple `auth.json`-style profiles under `~/.codex/authx/` and lets you initialize, list, save, and switch between them from a local CLI or a packaged macOS binary.
 
 ## Features
 
@@ -19,7 +19,28 @@
 
 ## Installation
 
-### Local development install
+### GitHub binary download
+
+Download the matching archive from GitHub Releases:
+
+- `codex-authx-macos-x64.tar.gz`
+- `codex-authx-macos-arm64.tar.gz`
+
+After download:
+
+```bash
+tar -xzf codex-authx-macos-<arch>.tar.gz
+chmod +x codex-authx
+./codex-authx list
+```
+
+To make it globally runnable:
+
+```bash
+mv codex-authx /usr/local/bin/codex-authx
+```
+
+### Local source install
 
 ```bash
 git clone https://github.com/nikkofu/codex-authx.git
@@ -35,20 +56,46 @@ From the repo root:
 npm link
 ```
 
-That exposes the `authx` command globally on your machine using the package `bin` entry.
+That exposes the `codex-authx` command globally on your machine using the package `bin` entry.
+
+### Build macOS release archives locally
+
+From the repo root:
+
+```bash
+npm run build:release
+```
+
+On a local machine, this builds the binary for the current macOS architecture and produces the matching pair of outputs:
+
+- Intel macOS:
+  - `artifacts/bin/macos-x64/codex-authx`
+  - `artifacts/release/codex-authx-macos-x64.tar.gz`
+- Apple Silicon macOS:
+  - `artifacts/bin/macos-arm64/codex-authx`
+  - `artifacts/release/codex-authx-macos-arm64.tar.gz`
+
+In practice:
+
+- on Intel macOS, the local build produces the `macos-x64` archive
+- on Apple Silicon macOS, the local build produces the `macos-arm64` archive
+
+The GitHub Actions workflow `.github/workflows/release-binaries.yml` builds both architectures on matching runners and publishes both archives for tagged releases.
+
+The first build may download binary build dependencies for the packager.
 
 ## Usage
 
 ### Initialize and print version
 
 ```bash
-authx
+codex-authx
 ```
 
-Or without `npm link`:
+Or from source without `npm link`:
 
 ```bash
-npm run authx
+npm run codex-authx
 ```
 
 This prints the current version, creates `~/.codex/authx/` if missing, and copies `~/.codex/auth.json` to `~/.codex/authx/default.json` if `default.json` does not already exist.
@@ -56,7 +103,7 @@ This prints the current version, creates `~/.codex/authx/` if missing, and copie
 ### List profiles
 
 ```bash
-authx list
+codex-authx list
 ```
 
 Example output:
@@ -70,7 +117,7 @@ team-b
 ### Save the current active auth as a named profile
 
 ```bash
-authx save "Team A"
+codex-authx save "Team A"
 ```
 
 This stores the current `~/.codex/auth.json` as:
@@ -89,7 +136,7 @@ Reserved internal names such as `last-active` cannot be used as saved profile na
 ### Switch to a saved profile
 
 ```bash
-authx switch "Team A"
+codex-authx switch "Team A"
 ```
 
 Before switching, the current `~/.codex/auth.json` is backed up to:
@@ -130,10 +177,10 @@ Build TypeScript:
 npm run build
 ```
 
-Run the CLI without linking:
+Run the CLI from source without linking:
 
 ```bash
-npm run authx -- list
+npm run codex-authx -- list
 ```
 
 ## Release Notes Discipline

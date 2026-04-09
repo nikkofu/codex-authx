@@ -20,7 +20,7 @@ export async function runCli(args: string[]): Promise<number> {
   try {
     if (!command) {
       const result = await initializeAuthx({ homeDir });
-      console.log(`authx v0.1.0`);
+      console.log(`codex-authx v0.1.0`);
       console.log(result.seededDefault ? "initialized default profile" : "authx ready");
       return 0;
     }
@@ -55,5 +55,6 @@ export async function runCli(args: string[]): Promise<number> {
   }
 }
 
-const exitCode = await runCli(process.argv.slice(2));
-process.exitCode = exitCode;
+void runCli(process.argv.slice(2)).then((exitCode) => {
+  process.exitCode = exitCode;
+});

@@ -15,6 +15,17 @@ import {
   assertSavableProfileName,
   normalizeProfileName
 } from "../src/core/naming.js";
+import {
+  buildOutputPathForTarget,
+  archiveFileNameForTarget,
+  binaryFileNameForTarget,
+  releaseTargets,
+  supportedReleaseTargetsForHost
+} from "../src/release/targets.js";
+import {
+  releaseArchiveEntries,
+  releaseDirectoryNameForTarget
+} from "../src/release/layout.js";
 
 const tempDirs: string[] = [];
 const execFileAsync = promisify(execFile);
@@ -35,7 +46,7 @@ async function makeHomeDir(): Promise<string> {
 }
 
 async function runCli(args: string[], homeDir: string): Promise<{ stdout: string; stderr: string }> {
-  return execFileAsync(process.execPath, ["bin/authx.js", ...args], {
+  return execFileAsync(process.execPath, ["bin/codex-authx.js", ...args], {
     cwd: process.cwd(),
     env: {
       ...process.env,
@@ -187,7 +198,16 @@ describe("authx switch", () => {
   });
 });
 
-describe("authx cli", () => {
+describe("codex-authx cli", () => {
+  it("publishes the codex-authx bin entry", async () => {
+    const packageJson = JSON.parse(await readFile(path.join(process.cwd(), "package.json"), "utf8"));
+
+    expect(packageJson.name).toBe("codex-authx");
+    expect(packageJson.bin).toEqual({
+      "codex-authx": "./bin/codex-authx.js"
+    });
+  });
+
   it("initializes authx and prints version information", async () => {
     const homeDir = await makeHomeDir();
     const codexDir = path.join(homeDir, ".codex");
@@ -196,7 +216,7 @@ describe("authx cli", () => {
 
     const result = await runCli([], homeDir);
 
-    expect(result.stdout).toContain("authx v0.1.0");
+    expect(result.stdout).toContain("codex-authx v0.1.0");
     await expect(readFile(path.join(codexDir, "authx", "default.json"), "utf8")).resolves.toBe(
       '{"token":"active"}'
     );
@@ -242,5 +262,69 @@ describe("authx cli", () => {
     await expect(readFile(path.join(codexDir, "auth.json"), "utf8")).resolves.toBe(
       '{"token":"after"}'
     );
+  });
+});
+
+describe("codex-authx release targets", () => {
+  it("defines macOS x64 and arm64 binary targets", () => {
+    expect(releaseTargets.map((target) => target.id)).toEqual(["macos-x64", "macos-arm64"]);
+    expect(releaseTargets.map((target) => target.pkgTarget)).toEqual([
+      "node18-macos-x64",
+      "node18-macos-arm64"
+    ]);
+  });
+
+  it("uses codex-authx as the binary file name for all targets", () => {
+    expect(releaseTargets.map(binaryFileNameForTarget)).toEqual(["codex-authx", "codex-authx"]);
+  });
+
+  it("derives GitHub release archive names from target ids", () => {
+    expect(releaseTargets.map(archiveFileNameForTarget)).toEqual([
+      "codex-authx-macos-x64.tar.gz",
+      "codex-authx-macos-arm64.tar.gz"
+    ]);
+  });
+
+  it("derives per-target binary output paths", () => {
+    expect(releaseTargets.map((target) => buildOutputPathForTarget("artifacts/bin", target))).toEqual(
+      [
+        path.join("artifacts/bin", "macos-x64", "codex-authx"),
+        path.join("artifacts/bin", "macos-arm64", "codex-authx")
+      ]
+    );
+  });
+
+  it("filters local build targets to the current macOS host architecture", () => {
+    expect(
+      supportedReleaseTargetsForHost({
+        platform: "darwin",
+        arch: "x64"
+      }).map((target) => target.id)
+    ).toEqual(["macos-x64"]);
+
+    expect(
+      supportedReleaseTargetsForHost({
+        platform: "darwin",
+        arch: "arm64"
+      }).map((target) => target.id)
+    ).toEqual(["macos-arm64"]);
+  });
+});
+
+describe("codex-authx release layout", () => {
+  it("defines release directories per target", () => {
+    expect(releaseTargets.map(releaseDirectoryNameForTarget)).toEqual([
+      "codex-authx-macos-x64",
+      "codex-authx-macos-arm64"
+    ]);
+  });
+
+  it("includes the binary, README, and LICENSE in each release archive", async () => {
+    const packageJson = JSON.parse(await readFile(path.join(process.cwd(), "package.json"), "utf8"));
+
+    expect(packageJson.scripts["build:js"]).toBe("tsc -p tsconfig.json");
+    expect(packageJson.scripts["build:bin"]).toBe("node ./scripts/build-release.mjs");
+    expect(packageJson.scripts["build:release"]).toBe("npm run build:js && npm run build:bin");
+    expect(releaseArchiveEntries()).toEqual(["codex-authx", "README.md", "LICENSE"]);
   });
 });
