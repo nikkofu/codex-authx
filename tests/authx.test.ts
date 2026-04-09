@@ -345,7 +345,7 @@ describe("codex-authx release layout", () => {
     expect(workflow).toContain("uses: actions/setup-node@v6");
     expect(workflow).toContain("uses: actions/upload-artifact@v6");
     expect(workflow).toContain("uses: actions/download-artifact@v8");
-    expect(workflow).toContain("uses: softprops/action-gh-release@v2.6.1");
+    expect(workflow).not.toContain("softprops/action-gh-release");
   });
 
   it("only validates release tags on tag-triggered runs", async () => {
@@ -378,6 +378,18 @@ describe("codex-authx release layout", () => {
     );
 
     expect(workflow).toContain("release-artifacts/**/*.tar.gz");
+  });
+
+  it("publishes releases via gh cli with an explicit GitHub token", async () => {
+    const workflow = await readFile(
+      path.join(process.cwd(), ".github", "workflows", "release-binaries.yml"),
+      "utf8"
+    );
+
+    expect(workflow).toContain("GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}");
+    expect(workflow).toContain("gh release view");
+    expect(workflow).toContain("gh release create");
+    expect(workflow).toContain("gh release upload");
   });
 });
 

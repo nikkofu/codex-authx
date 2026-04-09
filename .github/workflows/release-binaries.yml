@@ -75,7 +75,13 @@ jobs:
         run: node ./scripts/extract-release-notes.mjs "${GITHUB_REF_NAME}" release-notes.txt
 
       - name: Publish GitHub Release assets
-        uses: softprops/action-gh-release@v2.6.1
-        with:
-          body_path: release-notes.txt
-          files: release-artifacts/**/*.tar.gz
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release edit "$TAG_NAME" --title "$TAG_NAME" --notes-file release-notes.txt
+          else
+            gh release create "$TAG_NAME" --title "$TAG_NAME" --notes-file release-notes.txt --verify-tag
+          fi
+          gh release upload "$TAG_NAME" release-artifacts/**/*.tar.gz --clobber
