@@ -28,6 +28,22 @@ cd codex-authx
 npm install
 ```
 
+### Install into local Codex directories
+
+From the cloned GitHub repo:
+
+```bash
+npm run install:local
+```
+
+This does three things:
+
+- creates or updates `~/.agents/plugins/marketplace.json`
+- links `plugins/authx/` into `~/plugins/authx`
+- links `commands/authx.md` into `~/.codex/commands/authx.md`
+
+After that, restart Codex if your client caches plugin or command discovery.
+
 ### Optional local CLI exposure
 
 From the repo root:
@@ -117,13 +133,13 @@ Then `~/.codex/authx/team-a.json` is copied over `~/.codex/auth.json`.
 
 This repo includes two thin Codex-facing adapters.
 
-### Repo-local slash command
+### Global slash command install
 
-`commands/authx.md` provides a repo-local `/authx` command prompt for Codex setups that discover commands from the project root.
+`npm run install:local` links `commands/authx.md` to `~/.codex/commands/authx.md`, which is intended to expose `/authx` as a global command on Codex setups that scan that directory.
 
 ### Local plugin wrapper
 
-`plugins/authx/` contains a thin wrapper that delegates directly to `bin/authx.js`. The repo also includes `.agents/plugins/marketplace.json` so the plugin can be referenced as a local marketplace entry.
+`plugins/authx/` contains a thin wrapper that delegates directly to `bin/authx.js`. The installer writes or updates `~/.agents/plugins/marketplace.json` and links the plugin into `~/plugins/authx`.
 
 The wrapper intentionally does not reimplement auth logic; it just forwards arguments to the CLI.
 
@@ -145,6 +161,12 @@ Run the CLI without linking:
 
 ```bash
 npm run authx -- list
+```
+
+Reinstall the Codex command/plugin wiring after updates:
+
+```bash
+npm run install:local
 ```
 
 ## Release Notes Discipline

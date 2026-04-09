@@ -12,6 +12,11 @@ import {
   switchProfile
 } from "../src/core/authx.js";
 import {
+  createMarketplaceEntry,
+  type MarketplaceFile,
+  upsertMarketplacePlugin
+} from "../src/install/local-install.js";
+import {
   assertSavableProfileName,
   normalizeProfileName
 } from "../src/core/naming.js";
@@ -266,5 +271,49 @@ describe("authx plugin wrapper", () => {
     const result = await runPlugin(["list"], homeDir);
 
     expect(result.stdout.trim()).toBe("default\nteam-a");
+  });
+});
+
+describe("authx local install helpers", () => {
+  it("adds authx to a marketplace while preserving existing plugins", () => {
+    const marketplace: MarketplaceFile = {
+      name: "local-marketplace",
+      interface: {
+        displayName: "Local"
+      },
+      plugins: [
+        {
+          name: "existing",
+          source: { source: "local", path: "./plugins/existing" },
+          policy: { installation: "AVAILABLE", authentication: "ON_INSTALL" },
+          category: "Productivity"
+        }
+      ]
+    };
+
+    const updated = upsertMarketplacePlugin(
+      marketplace,
+      createMarketplaceEntry("./plugins/authx")
+    );
+
+    expect(updated.plugins.map((plugin) => plugin.name)).toEqual(["existing", "authx"]);
+  });
+
+  it("replaces the authx entry instead of duplicating it", () => {
+    const marketplace: MarketplaceFile = {
+      name: "local-marketplace",
+      interface: {
+        displayName: "Local"
+      },
+      plugins: [createMarketplaceEntry("./plugins/old-authx")]
+    };
+
+    const updated = upsertMarketplacePlugin(
+      marketplace,
+      createMarketplaceEntry("./plugins/authx")
+    );
+
+    expect(updated.plugins).toHaveLength(1);
+    expect(updated.plugins[0]?.source.path).toBe("./plugins/authx");
   });
 });

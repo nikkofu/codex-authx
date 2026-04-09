@@ -6,5 +6,6 @@
 - Added safe profile-name normalization and reserved-name protection.
 - Added automatic `last-active.json` backup during profile switching.
 - Added a thin local plugin wrapper under `plugins/authx/`.
-- Added repo-local command metadata under `commands/authx.md`.
-- Added setup and usage documentation.
+- Added a local installer that wires the plugin marketplace and global `/authx` command from the cloned GitHub repo.
+- Added command metadata under `commands/authx.md`.
+- Added setup, install, and usage documentation.
