@@ -13,6 +13,31 @@ function resolveHomeDir(): string {
   return process.env.AUTHX_HOME_DIR || os.homedir();
 }
 
+function renderHelp(seedMessage?: string): string {
+  const lines = [
+    "codex-authx v0.1.2"
+  ];
+
+  if (seedMessage) {
+    lines.push(seedMessage);
+  }
+
+  lines.push(
+    "",
+    "Usage:",
+    "  codex-authx help",
+    "  codex-authx list",
+    '  codex-authx save "Team A"',
+    '  codex-authx switch "Team A"',
+    "",
+    "Notes:",
+    "  Any command initializes ~/.codex/authx/ on first run.",
+    "  If ~/.codex/auth.json exists, default.json is seeded automatically."
+  );
+
+  return lines.join("\n");
+}
+
 export async function runCli(args: string[]): Promise<number> {
   const homeDir = resolveHomeDir();
   const [command, ...rest] = args;
@@ -20,9 +45,10 @@ export async function runCli(args: string[]): Promise<number> {
   try {
     const initialization = await initializeAuthx({ homeDir });
 
-    if (!command) {
-      console.log(`codex-authx v0.1.0`);
-      console.log(initialization.seededDefault ? "initialized default profile" : "authx ready");
+    if (!command || command === "help") {
+      console.log(
+        renderHelp(initialization.seededDefault ? "initialized default profile" : undefined)
+      );
       return 0;
     }
 
@@ -48,7 +74,7 @@ export async function runCli(args: string[]): Promise<number> {
       return 0;
     }
 
-    throw new Error(`unknown command: ${command}`);
+    throw new Error(`unknown command: ${command}\nrun 'codex-authx help' for usage`);
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown error";
     console.error(message);

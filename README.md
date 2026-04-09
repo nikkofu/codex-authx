@@ -104,21 +104,36 @@ The release workflow enforces that:
 
 ## Usage
 
-### Initialize and print version
+### Show help and first-run status
 
 ```bash
 codex-authx
 ```
 
+Or:
+
+```bash
+codex-authx help
+```
+
 Or from source without `npm link`:
 
 ```bash
-npm run codex-authx
+npm run codex-authx -- help
 ```
 
-This prints the current version, creates `~/.codex/authx/` if missing, and copies `~/.codex/auth.json` to `~/.codex/authx/default.json` if `default.json` does not already exist.
+This prints the current version and usage guide. On first run it also creates `~/.codex/authx/`, and copies `~/.codex/auth.json` to `~/.codex/authx/default.json` if `default.json` does not already exist.
 
 The same first-run initialization also happens before `list`, `save`, and `switch`, so users do not need to run a separate bootstrap command first.
+
+### Daily usage
+
+```bash
+codex-authx help
+codex-authx list
+codex-authx save "Team A"
+codex-authx switch "Team A"
+```
 
 ### List profiles
 
@@ -135,6 +150,7 @@ team-b
 ```
 
 On a first run, `list` also seeds `default.json` automatically when `~/.codex/auth.json` already exists.
+If Codex has never been installed or logged in on that machine, `list` may still be empty.
 
 ### Save the current active auth as a named profile
 

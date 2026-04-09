@@ -50,14 +50,36 @@ async function makeHomeDir(): Promise<string> {
   return dir;
 }
 
-async function runCli(args: string[], homeDir: string): Promise<{ stdout: string; stderr: string }> {
-  return execFileAsync(process.execPath, ["bin/codex-authx.js", ...args], {
-    cwd: process.cwd(),
-    env: {
-      ...process.env,
-      AUTHX_HOME_DIR: homeDir
-    }
-  });
+async function runCli(
+  args: string[],
+  homeDir: string
+): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+  try {
+    const result = await execFileAsync(process.execPath, ["bin/codex-authx.js", ...args], {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        AUTHX_HOME_DIR: homeDir
+      }
+    });
+
+    return {
+      ...result,
+      exitCode: 0
+    };
+  } catch (error) {
+    const execError = error as Error & {
+      code?: number;
+      stdout?: string;
+      stderr?: string;
+    };
+
+    return {
+      stdout: execError.stdout || "",
+      stderr: execError.stderr || "",
+      exitCode: execError.code ?? 1
+    };
+  }
 }
 
 describe("authx naming", () => {
@@ -213,7 +235,7 @@ describe("codex-authx cli", () => {
     });
   });
 
-  it("initializes authx and prints version information", async () => {
+  it("prints help and version information with no command", async () => {
     const homeDir = await makeHomeDir();
     const codexDir = path.join(homeDir, ".codex");
     await mkdir(codexDir, { recursive: true });
@@ -221,10 +243,23 @@ describe("codex-authx cli", () => {
 
     const result = await runCli([], homeDir);
 
-    expect(result.stdout).toContain("codex-authx v0.1.0");
+    expect(result.stdout).toContain("codex-authx v0.1.2");
+    expect(result.stdout).toContain("Usage:");
+    expect(result.stdout).toContain("codex-authx help");
     await expect(readFile(path.join(codexDir, "authx", "default.json"), "utf8")).resolves.toBe(
       '{"token":"active"}'
     );
+  });
+
+  it("prints help with the help command", async () => {
+    const homeDir = await makeHomeDir();
+
+    const result = await runCli(["help"], homeDir);
+
+    expect(result.stdout).toContain("Usage:");
+    expect(result.stdout).toContain("codex-authx list");
+    expect(result.stdout).toContain("codex-authx save \"Team A\"");
+    expect(result.stdout).toContain("codex-authx switch \"Team A\"");
   });
 
   it("lists profiles one per line", async () => {
@@ -281,6 +316,16 @@ describe("codex-authx cli", () => {
     await expect(readFile(path.join(codexDir, "auth.json"), "utf8")).resolves.toBe(
       '{"token":"after"}'
     );
+  });
+
+  it("suggests the help command for unknown commands", async () => {
+    const homeDir = await makeHomeDir();
+
+    const result = await runCli(["nope"], homeDir);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("unknown command: nope");
+    expect(result.stderr).toContain("run 'codex-authx help' for usage");
   });
 });
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2 - 2026-04-09
+
+- Added `codex-authx help` and made the no-argument command print a usage guide instead of only a status line.
+- Improved unknown-command errors to point users to `codex-authx help`.
+- Expanded README daily usage guidance to cover help, first-run initialization, and common profile workflows.
+
 ## 0.1.1 - 2026-04-09
 
 - Fixed first-run CLI behavior so `list`, `save`, and `switch` also initialize `~/.codex/authx/`.
