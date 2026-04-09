@@ -1,0 +1,31 @@
+{
+  "name": "authx",
+  "version": "0.1.0",
+  "description": "Switch between local Codex auth profiles.",
+  "author": {
+    "name": "nikkofu",
+    "email": "noreply@example.com",
+    "url": "https://github.com/nikkofu"
+  },
+  "homepage": "https://github.com/nikkofu/codex-authx",
+  "repository": "https://github.com/nikkofu/codex-authx",
+  "license": "MIT",
+  "keywords": ["codex", "auth", "profiles"],
+  "interface": {
+    "displayName": "Authx",
+    "shortDescription": "Manage Codex auth profiles",
+    "longDescription": "Initialize, save, list, and switch local Codex auth.json profiles.",
+    "developerName": "Authx",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "websiteURL": "https://github.com/nikkofu/codex-authx",
+    "privacyPolicyURL": "https://openai.com/policies/row-privacy-policy/",
+    "termsOfServiceURL": "https://openai.com/policies/row-terms-of-use/",
+    "defaultPrompt": [
+      "/authx",
+      "/authx list",
+      "/authx switch team-a"
+    ],
+    "brandColor": "#14532D"
+  }
+}
