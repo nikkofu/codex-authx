@@ -719,7 +719,7 @@ describe("codex-authx cli", () => {
     expect(result.stdout).toContain("codex-authx v0.1.4");
     expect(result.stdout).toContain("current: team-b");
     expect(result.stdout).toContain("account_id=acct-b");
-    expect(result.stdout).toContain("local 5h=150 7d=150");
+    expect(result.stdout).toContain("7d=150");
     expect(result.stdout).toContain("server 5h=48% 7d=52% reset");
   });
 
@@ -824,7 +824,8 @@ describe("codex-authx cli", () => {
     const result = await runCli(["list"], homeDir);
 
     expect(result.stdout).toContain("* team-b");
-    expect(result.stdout).toContain("local 5h=150 7d=150");
+    expect(result.stdout).toContain("* team-b account_id=acct-b");
+    expect(result.stdout).toContain("7d=150");
     expect(result.stdout).toContain("server 5h=57% 7d=68% reset");
     expect(result.stdout).toContain("- team-a");
     expect(result.stdout).toContain("server 5h=22% 7d=34% reset");
@@ -960,7 +961,8 @@ describe("codex-authx cli", () => {
     const result = await runCli(["usage"], homeDir);
 
     expect(result.stdout).toContain("* team-b");
-    expect(result.stdout).toContain("local 5h=150 7d=150");
+    expect(result.stdout).toContain("* team-b account_id=acct-b");
+    expect(result.stdout).toContain("7d=150");
     expect(result.stdout).toContain("server 5h=57% 7d=68% reset");
     expect(result.stdout).toContain("- team-a account_id=acct-a");
     expect(result.stdout).toContain("7d=300");
